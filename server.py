@@ -37,7 +37,6 @@ class MyWebServer(SocketServer.BaseRequestHandler):
         requestType = request[0]
         requestedFile = request[1]
         print ("Got the following request: %s\n" % self.data)
-        msg = ""
         
         # Make sure only the GET request is allowed.
         if (requestType != "GET"):
@@ -46,8 +45,13 @@ class MyWebServer(SocketServer.BaseRequestHandler):
             
         else:
             try:
+                # if no file is given, re-direct to base.css
+                if requestedFile.endswith("/"):
+                    requestedFile += "base.css"
+                    
                 # Handle the GET request, obtain file information
                 file = open("www/" + requestedFile, 'r')
+                msg = ""
                 for line in file:
                     msg += line
                 
@@ -57,8 +61,7 @@ class MyWebServer(SocketServer.BaseRequestHandler):
                 elif requestedFile.endswith(".css"):
                     mimeType = 'text/css'
                 else:
-                    self.request.sendall(self.generate_headers(415))
-                    self.request.sendall("Only .html and .css files are supported.")
+                    self.request.sendall(self.generate_headers(404))
                     self.request.close()
                     
                 self.request.sendall(self.generate_headers(200))
@@ -67,6 +70,7 @@ class MyWebServer(SocketServer.BaseRequestHandler):
                 self.request.sendall(msg + "\r\n\r\n")
             
             except:
+                # Requested file doesn't exist, throw 404 exception code
                 response_headers = self.generate_headers(404)
                 self.request.sendall(response_headers)
                 
@@ -81,7 +85,8 @@ class MyWebServer(SocketServer.BaseRequestHandler):
         elif (code == 404):
             h = "HTTP/1.1 404 NOT FOUND\r\n\r\n"
         elif (code == 415):
-            h = ("HTTP/1.1 415 UNSUPPORTED MEDIA TYPE\r\n\r\n")
+            h = ("HTTP/1.1 415 UNSUPPORTED MEDIA TYPE\r\n" +
+                 "Only .html and .css files are supported.\r\n\r\n")
         elif (code == 501):
             h = ("HTTP/1.1 501 METHOD NOT IMPLEMENTED\r\n" +
                  "Content-Type: text/html\r\n" +
