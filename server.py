@@ -1,5 +1,6 @@
 #  coding: utf-8 
 import SocketServer
+import os
 
 # Copyright 2013 Abram Hindle, Eddie Antonio Santos
 # 
@@ -32,27 +33,59 @@ class MyWebServer(SocketServer.BaseRequestHandler):
     def handle(self):
         self.data = self.request.recv(1024).strip()
         requests = self.data.splitlines() # ex: ['GET / HTTP/1.1', 'User-Agent: curl/7.35.0', 'Host: 127.0.0.1:8080', 'Accept: */*']
-        requestType = requests[0].split() # ex: 'GET / HTTP/1.1'
+        request = requests[0].split() # ex: 'GET / HTTP/1.1'
+        requestType = request[0]
+        requestedFile = request[1]
         print ("Got the following request: %s\n" % self.data)
         msg = ""
         
         # Make sure only the GET request is allowed.
-        if (requestType[0] != "GET"):
-            response_headers = self.generate_headers(405)
-            msg += "Only GET requests are allowed. \n\n"
-            msg += response_headers
+        if (requestType != "GET"):
+            response_headers = self.generate_headers(501)
+            self.request.sendall(response_headers)
+            
+        else:
+            try:
+                # Handle the GET request, obtain file information
+                file = open("www/" + requestedFile, 'r')
+                for line in file:
+                    msg += line
+                
+                mimeType = ""
+                if requestedFile.endswith(".html"):
+                    mimeType = 'text/html'
+                elif requestedFile.endswith(".css"):
+                    mimeType = 'text/css'
+                else:
+                    self.request.sendall(self.generate_headers(415))
+                    self.request.sendall("Only .html and .css files are supported.")
+                    self.request.close()
+                    
+                self.request.sendall(self.generate_headers(200))
+                self.request.sendall("Content-Type: " + mimeType + "\r\n")
+                self.request.sendall("Content-Length: " + len(msg) + "\r\n")
+                self.request.sendall(msg + "\r\n\r\n")
+            
+            except:
+                response_headers = self.generate_headers(404)
+                self.request.sendall(response_headers)
+                
         
-        self.request.sendall(msg)
+        self.request.close()
         
     def generate_headers(self, code):
         # generate header depending on the response code 
         h = ''
         if (code == 200):
-            h = 'HTTP/1.1 200 OK\n'
+            h = "HTTP/1.1 200 OK\r\n"
         elif (code == 404):
-            h = 'HTTP/1.1 404 NOT FOUND\n'
-        elif (code == 405):
-            h = 'HTTP/1.1 405 METHOD NOT ALLOWED\n'            
+            h = "HTTP/1.1 404 NOT FOUND\r\n\r\n"
+        elif (code == 415):
+            h = ("HTTP/1.1 415 UNSUPPORTED MEDIA TYPE\r\n\r\n")
+        elif (code == 501):
+            h = ("HTTP/1.1 501 METHOD NOT IMPLEMENTED\r\n" +
+                 "Content-Type: text/html\r\n" +
+                 "Only the GET request is supported.\r\n\r\n")
         return h
         
 
