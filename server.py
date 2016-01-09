@@ -31,8 +31,30 @@ class MyWebServer(SocketServer.BaseRequestHandler):
     
     def handle(self):
         self.data = self.request.recv(1024).strip()
-        print ("Got a request of: %s\n" % self.data)
-        self.request.sendall("OK")
+        requests = self.data.splitlines() # ex: ['GET / HTTP/1.1', 'User-Agent: curl/7.35.0', 'Host: 127.0.0.1:8080', 'Accept: */*']
+        requestType = requests[0].split() # ex: 'GET / HTTP/1.1'
+        print ("Got the following request: %s\n" % self.data)
+        msg = ""
+        
+        # Make sure only the GET request is allowed.
+        if (requestType[0] != "GET"):
+            response_headers = self.generate_headers(405)
+            msg += "Only GET requests are allowed. \n\n"
+            msg += response_headers
+        
+        self.request.sendall(msg)
+        
+    def generate_headers(self, code):
+        # generate header depending on the response code 
+        h = ''
+        if (code == 200):
+            h = 'HTTP/1.1 200 OK\n'
+        elif (code == 404):
+            h = 'HTTP/1.1 404 NOT FOUND\n'
+        elif (code == 405):
+            h = 'HTTP/1.1 405 METHOD NOT ALLOWED\n'            
+        return h
+        
 
 if __name__ == "__main__":
     HOST, PORT = "localhost", 8080
@@ -40,6 +62,7 @@ if __name__ == "__main__":
     SocketServer.TCPServer.allow_reuse_address = True
     # Create the server, binding to localhost on port 8080
     server = SocketServer.TCPServer((HOST, PORT), MyWebServer)
+    print ("Starting server on port 8080. To stop the program, do Ctrl-C.")
 
     # Activate the server; this will keep running until you
     # interrupt the program with Ctrl-C
