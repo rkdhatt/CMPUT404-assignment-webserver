@@ -45,8 +45,10 @@ class MyWebServer(SocketServer.BaseRequestHandler):
             
         else:
             try:
-                # if no file is given, re-direct to base.css
-                if requestedFile.endswith("/"):
+                # if no file is given, re-direct to base.css, or deep.css if deep file is accessed.
+                if requestedFile.endswith("/deep/"):
+                    requestedFile += "deep.css"                
+                elif requestedFile.endswith("/"):
                     requestedFile += "base.css"
                     
                 # Handle the GET request, obtain file information
