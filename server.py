@@ -63,8 +63,7 @@ class MyWebServer(SocketServer.BaseRequestHandler):
                 elif requestedFile.endswith(".css"):
                     mimeType = 'text/css'
                 else:
-                    self.request.sendall(self.generate_headers(404))
-                    self.request.close()
+                    raise Exception
                     
                 self.request.sendall(self.generate_headers(200))
                 self.request.sendall("Content-Type: " + mimeType + "\r\n")
