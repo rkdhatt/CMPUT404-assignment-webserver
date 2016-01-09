@@ -71,7 +71,7 @@ class MyWebServer(SocketServer.BaseRequestHandler):
                 self.request.sendall(msg + "\r\n\r\n")
             
             except:
-                # Requested file doesn't exist, throw 404 exception code
+                # If requested file doesn't exist or unsupported file type, throw 404 exception code
                 response_headers = self.generate_headers(404)
                 self.request.sendall(response_headers)
                 
