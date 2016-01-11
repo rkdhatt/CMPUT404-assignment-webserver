@@ -45,11 +45,11 @@ class MyWebServer(SocketServer.BaseRequestHandler):
             
         else:
             try:
-                # if no file is given, re-direct to base.css, or deep.css if deep file is accessed.
+                # if no file is given, re-direct to index.html if deep file is accessed.
                 if requestedFile.endswith("/deep/"):
-                    requestedFile += "deep.css"                
+                    requestedFile += "index.html"                
                 elif requestedFile.endswith("/"):
-                    requestedFile += "base.css"
+                    requestedFile += "index.html"
                     
                 # Handle the GET request, obtain file information
                 file = open("www/" + requestedFile, 'r')
@@ -75,7 +75,7 @@ class MyWebServer(SocketServer.BaseRequestHandler):
                 response_headers = self.generate_headers(404)
                 self.request.sendall(response_headers)
                 
-        
+        print('OK\n\n')
         self.request.close()
         
     def generate_headers(self, code):
