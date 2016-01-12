@@ -64,11 +64,11 @@ class MyWebServer(SocketServer.BaseRequestHandler):
                     mimeType = 'text/css'
                 else:
                     raise Exception
-                    
+               
                 self.request.sendall(self.generate_headers(200))
-                self.request.sendall("Content-Type: " + mimeType + "\r\n")
-                self.request.sendall("Content-Length: " + len(msg) + "\r\n")
-                self.request.sendall(msg + "\r\n\r\n")
+		self.request.sendall("Content-Type: " + mimeType + "\r\n")
+		self.request.sendall("Content-Length: " + str(len(msg)) + "\r\n\r\n")
+                self.request.sendall(msg)
             
             except:
                 # If requested file doesn't exist or unsupported file type, throw 404 exception code
@@ -84,13 +84,13 @@ class MyWebServer(SocketServer.BaseRequestHandler):
         if (code == 200):
             h = "HTTP/1.1 200 OK\r\n"
         elif (code == 404):
-            h = "HTTP/1.1 404 NOT FOUND\r\n\r\n"
+            h = "HTTP/1.1 404 NOT FOUND\r\n\r\n<html><body><h1>Error 404: NOT FOUND</h1><p>File not found.</p></body></html>"
         elif (code == 415):
             h = ("HTTP/1.1 415 UNSUPPORTED MEDIA TYPE\r\n" +
                  "Only .html and .css files are supported.\r\n\r\n")
         elif (code == 501):
             h = ("HTTP/1.1 501 METHOD NOT IMPLEMENTED\r\n" +
-                 "Content-Type: text/html\r\n" +
+                 "Content-type: text/html\r\n" +
                  "Only the GET request is supported.\r\n\r\n")
         return h
         
