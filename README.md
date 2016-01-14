@@ -33,4 +33,6 @@ http://www.binarytides.com/python-socket-programming-tutorial/ 2016-01-09 (from 
 
 http://stackoverflow.com/questions/947372/custom-simple-python-http-server-not-serving-css-files 2016-01-09
 
+http://tools.ietf.org/html/rfc2616 2016-01-09
+
 

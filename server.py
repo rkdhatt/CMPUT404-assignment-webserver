@@ -45,8 +45,11 @@ class MyWebServer(SocketServer.BaseRequestHandler):
             
         else:
             try:
-                # if no file is given, re-direct to index.html if deep file is accessed.
-                if requestedFile.endswith("/deep/") or requestedFile.endswith("/"):
+
+		if requestedFile.endswith("deep"):
+		    requestedFile += "/"
+                # if no file is given, re-direct to index.html
+                if requestedFile.endswith("/"):
                     requestedFile += "index.html"
                     
                 # Handle the GET request, obtain file information
@@ -66,8 +69,8 @@ class MyWebServer(SocketServer.BaseRequestHandler):
 		# send information, including content type so that css works in browser.
                 self.request.sendall(self.generate_headers(200))
 		self.request.sendall("Content-Type: " + mimeType + "\r\n")
-		self.request.sendall("Content-Length: " + str(len(msg)) + "\r\n\r\n")
-                self.request.sendall(msg)
+		self.request.sendall("Content-Length: " + str(len(msg)) + "\r\n")
+                self.request.sendall(msg  + "\r\n\r\n")
             
             except:
                 # If requested file doesn't exist or unsupported file type, throw 404 exception code
@@ -81,6 +84,8 @@ class MyWebServer(SocketServer.BaseRequestHandler):
         h = ''
         if (code == 200):
             h = "HTTP/1.1 200 OK\r\n"
+	elif (code == 301):
+	    h = "HTTP/1.1 301 MOVED PERMANENTLY\r\n"
         elif (code == 404):
             h = "HTTP/1.1 404 NOT FOUND\r\n\r\n<html><body><h1>Error 404: NOT FOUND</h1><p>File not found.</p></body></html>"
         elif (code == 415):
