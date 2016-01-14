@@ -46,15 +46,13 @@ class MyWebServer(SocketServer.BaseRequestHandler):
         else:
             try:
                 # if no file is given, re-direct to index.html if deep file is accessed.
-                if requestedFile.endswith("/deep/"):
-                    requestedFile += "index.html"                
-                elif requestedFile.endswith("/"):
+                if requestedFile.endswith("/deep/") or requestedFile.endswith("/"):
                     requestedFile += "index.html"
                     
                 # Handle the GET request, obtain file information
-                file = open("www/" + requestedFile, 'r')
+                read_file = open("www/" + requestedFile, 'r')
                 msg = ""
-                for line in file:
+                for line in read_file:
                     msg += line
                 
                 mimeType = ""
@@ -65,6 +63,7 @@ class MyWebServer(SocketServer.BaseRequestHandler):
                 else:
                     raise Exception
                
+		# send information, including content type so that css works in browser.
                 self.request.sendall(self.generate_headers(200))
 		self.request.sendall("Content-Type: " + mimeType + "\r\n")
 		self.request.sendall("Content-Length: " + str(len(msg)) + "\r\n\r\n")
@@ -75,7 +74,6 @@ class MyWebServer(SocketServer.BaseRequestHandler):
                 response_headers = self.generate_headers(404)
                 self.request.sendall(response_headers)
                 
-        print('OK\n\n')
         self.request.close()
         
     def generate_headers(self, code):
