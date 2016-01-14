@@ -27,5 +27,10 @@ Other sources used:
 
 The following sources were used to understand how the HTTP server and web browser can communicate via requests and replies, and how the headers should be formatted along with the response codes.
 
-http://blog.wachowicz.eu/?p=256 2015-01-09
-http://www.binarytides.com/python-socket-programming-tutorial/ 2015-01-09 (from Lab 2)
+http://blog.wachowicz.eu/?p=256 2016-01-09
+
+http://www.binarytides.com/python-socket-programming-tutorial/ 2016-01-09 (from Lab 2)
+
+http://stackoverflow.com/questions/947372/custom-simple-python-http-server-not-serving-css-files 2016-01-09
+
+
