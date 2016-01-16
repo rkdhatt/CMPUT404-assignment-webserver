@@ -70,7 +70,6 @@ class MyWebServer(SocketServer.BaseRequestHandler):
                     mimeType = 'text/css'
                 else:
                     raise Exception
-		print("mimetype: " + mimeType + "\n")
                
 		# send information, including content type so that css works in browser.
                 self.request.sendall(self.generate_headers(200))
