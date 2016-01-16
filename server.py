@@ -48,11 +48,13 @@ class MyWebServer(SocketServer.BaseRequestHandler):
 
 		if requestedFile.endswith("deep"):
 		    requestedFile += "/"
+
                 # if no file is given, re-direct to index.html
                 if requestedFile.endswith("/"):
                     requestedFile += "index.html"
+		    print(self.generate_headers(301) + "\nLocation: " + requestedFile + "\r\n")
                     
-                # Handle the GET request, obtain file information
+                # Read the requested file
                 read_file = open("www/" + requestedFile, 'r')
                 msg = ""
                 for line in read_file:
@@ -69,13 +71,12 @@ class MyWebServer(SocketServer.BaseRequestHandler):
 		# send information, including content type so that css works in browser.
                 self.request.sendall(self.generate_headers(200))
 		self.request.sendall("Content-Type: " + mimeType + "\r\n")
-		self.request.sendall("Content-Length: " + str(len(msg)) + "\r\n")
+		self.request.sendall("Content-Length: " + str(len(msg)) + "\r\n\r\n")
                 self.request.sendall(msg  + "\r\n\r\n")
             
             except:
                 # If requested file doesn't exist or unsupported file type, throw 404 exception code
-                response_headers = self.generate_headers(404)
-                self.request.sendall(response_headers)
+                self.request.sendall(self.generate_headers(404))
                 
         self.request.close()
         
@@ -85,9 +86,10 @@ class MyWebServer(SocketServer.BaseRequestHandler):
         if (code == 200):
             h = "HTTP/1.1 200 OK\r\n"
 	elif (code == 301):
-	    h = "HTTP/1.1 301 MOVED PERMANENTLY\r\n"
+	    h = "HTTP/1.1 301 MOVED PERMANENTLY"
         elif (code == 404):
-            h = "HTTP/1.1 404 NOT FOUND\r\n\r\n<html><body><h1>Error 404: NOT FOUND</h1><p>File not found.</p></body></html>"
+            h = "HTTP/1.1 404 NOT FOUND\r\n\r\n<html><body><h1>Error 404: NOT FOUND</h1> \
+		<p>File not found.</p></body></html>\r\n\r\n"
         elif (code == 415):
             h = ("HTTP/1.1 415 UNSUPPORTED MEDIA TYPE\r\n" +
                  "Only .html and .css files are supported.\r\n\r\n")
