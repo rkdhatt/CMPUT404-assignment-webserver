@@ -71,7 +71,7 @@ class MyWebServer(SocketServer.BaseRequestHandler):
                 else:
                     raise Exception
                
-		# send information, including content type so that css works in browser.
+                # send information, including content type so that css works in browser.
                 self.request.sendall(self.generate_headers(200))
                 self.request.sendall("Content-Type: " + mimeType + "\r\n")
                 self.request.sendall("Content-Length: " + str(len(msg)) + "\r\n\r\n")
